@@ -30,4 +30,20 @@ public class WorkshopsController : ControllerBase
 
         return CreatedAtAction(nameof(GetWorkshops), new { id = workshop.ID }, workshop);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteWorkshop(int id)
+    {
+        var workshop = await _context.Workshops.FindAsync(id);
+
+        if (workshop == null)
+        {
+            return NotFound();
+        }
+
+        _context.Workshops.Remove(workshop);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
