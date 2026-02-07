@@ -31,6 +31,33 @@ public class WorkshopsController : ControllerBase
         return CreatedAtAction(nameof(GetWorkshops), new { id = workshop.ID }, workshop);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutWorkshop(int id, Workshop workshop)
+    {
+        if (id != workshop.ID)
+        {
+            return BadRequest("The ID is not correct");
+        }
+        _context.Entry(workshop).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Workshops.Any(e => e.ID == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteWorkshop(int id)
     {
