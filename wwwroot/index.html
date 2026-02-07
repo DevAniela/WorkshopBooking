@@ -23,38 +23,71 @@
         h1 {
             color: #333;
         }
+
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
     <h1>Available Workshops</h1>
 
+    <input type="text" id="search-input" placeholder="Search by title or location..." onkeyup="filterWorkshops()">
+
     <div id="workshops-list">Loading...</div>
 
     <script>
+
+        let allWorkshops = [];
+
         async function fetchWorkshops() {
             try {
                 const response = await fetch('http://localhost:5038/api/workshops');
-                const data = await response.json();
+                allWorkshops = await response.json();
+                displayWorkshops(allWorkshops);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('workshops-list').innerHtml = '<p>API Service Connection Refused</p>';
+            }
+        }
 
-                const listDiv = document.getElementById('workshops-list');
+        function displayWorkshops(workshops) {
+            const listDiv = document.getElementById('workshops-list');
 
-                data.forEach(w => {
-                    const card =
-                        `
+            listDiv.innerHTML = '';
+
+            if (workshops.length === 0) {
+                listDiv.innerHTML = '<p>No workshop found</p>';
+                return;
+            }
+
+            workshops.forEach(w => {
+                const card =
+                    `
                             <div class="card">
                                 <h3>${w.title}</h3>
                                 <p>${w.description}</p>
                                 <small>📍 ${w.location} | 📅 ${new Date(w.date).toLocaleDateString()}</small>
                             </div>
                         `;
-                    listDiv.innerHTML += card;
-                });
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('workshops-list').innerText = 'Data Loading Error';
-            }
+                listDiv.innerHTML += card;
+            });
         }
+
+        function filterWorkshops() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            const filtered = allWorkshops.filter(w => w.title.toLowerCase().includes(searchTerm) || w.location.toLowerCase().includes(searchTerm));
+
+            displayWorkshops(filtered);
+        }
+
         fetchWorkshops();
     </script>
 </body>
