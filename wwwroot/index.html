@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Available Workshops</h1>
+
+    <div id="workshops-list">Loading...</div>
+
+    <script>
+        async function fetchWorkshops() {
+            try {
+                const response = await fetch('http://localhost:5038/api/workshops');
+                const data = await response.json();
+
+                const listDiv = document.getElementById('workshops-list');
+
+                data.forEach(w => {
+                    const card =
+                        `
+                            <div class="card">
+                                <h3>${w.title}</h3>
+                                <p>${w.description}</p>
+                                <small>📍 ${w.location} | 📅 ${new Date(w.date).toLocaleDateString()}</small>
+                            </div>
+                        `;
+                    listDiv.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('workshops-list').innerText = 'Data Loading Error';
+            }
+        }
+        fetchWorkshops();
+    </script>
+</body>
+
+</html>
